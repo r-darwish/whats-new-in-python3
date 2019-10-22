@@ -1,49 +1,280 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>What's (not so) new in Python 3</title>
 
-		<link rel="stylesheet" href="css/reset.css">
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/solarized.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/solarized-light.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section><h2>What's (not so) new in Python 3</h2></section></section>
 
-		<script src="js/reveal.js"></script>
+        <section>
+          <h2>print is a function</h2>
+          <pre><code data-trim class="python">
+from functools import partial
+import sys
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true }
-				]
-			});
-		</script>
-	</body>
+eprint = partial(print, file=sys.stderr)
+print("Hello")
+eprint("error")
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Keyword only arguments</h2>
+          <pre><code data-trim class="python">
+def compress_file(file_name, *, level=9, retain_original):
+    ...
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>f-strings</h2>
+          <pre><code data-trim class="python">
+noun = "wood"
+verb = "chuck"
+print(f"""How much {noun} would a {noun + verb} {verb}
+if a {noun + verb} would {verb} {noun}?""")
+
+# How much wood would a woodchuck chuck
+# if a woodchuck would chuck wood?
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>f-strings</h2>
+          <h4>self-documenting expressions</h4>
+          <pre><code data-trim class="python">
+user = 'spongebob'
+member_since = date(1975, 7, 31)
+delta = date.today() - member_since
+print(f'{user=!s}  {delta.days=:,d}')
+
+# user=spongebob  delta.days=16,075
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Type annotations</h2>
+          <pre><code data-trim class="python">
+def attach_mark(weapon: str, mark: int) -> str:
+    return f"{weapon} Mark {mark}"
+
+print(attach_mark("Super Cannon", 4))
+
+# Super Canon Mark 4
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>bytes vs strings</h2>
+          <pre><code data-trim class="python">
+open("/etc/localtime", "r").read()
+# UnicodeDecodeError: 'utf-8' codec can't decode byte 0x92
+# in position 35: invalid start byte
+
+data = open("/etc/localtime", "rb").read()[:10]
+print(data)
+# b'TZif2\x00\x00\x00\x00\x00'
+
+data.replace("a", "b")
+# TypeError: a bytes-like object is required, not 'str'
+
+data.replace(b"\x00", b"\xff")
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Built-in virtualenv</h2>
+          <pre><code data-trim class="shell">
+python -m venv .env
+source .env/bin/activate
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Enums</h2>
+          <pre><code data-trim class="python">
+from enum import Enum, auto
+class Color(Enum):
+    RED = auto()
+    GREEN = auto()
+    BLUE = auto()
+
+apples = {Color.RED: 'red delicious', Color.GREEN: 'granny smith'}
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>dataclasses</h2>
+          <pre><code data-trim class="python">
+from dataclasses import dataclass
+
+@dataclass(frozen=True, order=True)
+class FullName:
+    first_name: str
+    last_name: str
+
+# Usage:
+people = [FullName("SpongeBob", "SquarePants"),
+          FullName("Patrick", "Star"),
+          FullName("Squidward", "Tentacles")]
+print(sorted(people))
+
+addresses = {FullName("SpongeBob", "SquarePants"):
+             "124 Conch Street"}
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Super doesn't need arguments</h2>
+          <p>Also, we don't need to inherit object</p>
+          <pre><code data-trim class="python">
+class Animal:
+    def __init__(self, name):
+        self._name = name
+
+
+class Dog:
+    def __init__(self, name):
+        super().__init__(name)
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Inner traceback</h2>
+          <pre><code data-trim class="python">
+class Inxception(Exception):
+    def __init__(self, level):
+        super().__init__(f&quot;Wake up from {level}&quot;)
+
+try:
+    try:
+        try:
+            raise Inxception(&quot;Limbo&quot;)
+        except Inxception:
+            raise Inxception(&quot;Snow Fortress&quot;)
+    except Inxception:
+        raise Inxception(&quot;Hotel&quot;)
+except Inxception:
+    raise Inxception(&quot;Van Chase&quot;)
+
+# Traceback (most recent call last):
+#   File &quot;inxception.py&quot;, line 8, in &lt;module&gt;
+# __main__.Inxception: Wake up from Limbo
+
+# During handling of the above exception, another exception occurred:
+
+# Traceback (most recent call last):
+#   File &quot;inxception.py&quot;, line 10, in &lt;module&gt;
+# __main__.Inxception: Wake up from Snow Fortress
+
+# During handling of the above exception, another exception occurred:
+
+# Traceback (most recent call last):
+#   File &quot;inxception.py&quot;, line 12, in &lt;module&gt;
+# __main__.Inxception: Wake up from Hotel
+
+# During handling of the above exception, another exception occurred:
+
+# Traceback (most recent call last):
+#   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+#   File &quot;inxception.py&quot;, line 14, in &lt;module&gt;
+# __main__.Inxception: Wake up from Van Chase
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>yield from</h2>
+          <pre><code data-trim class="python">
+def generate_lines(file_name):
+    with open(file_name, "r") as f:
+        for i, line in enumerate(f.readlines(), start=1):
+            yield f"{i}. {line}"
+
+
+def multigenerate(*file_names):
+    for file_name in file_names:
+        yield file_name + "\n"
+        yield from generate_lines(file_name)
+
+
+for line in multigenerate("/etc/profile", "/etc/shells"):
+    print(line, end="")
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Extended unpacking</h2>
+          <pre><code data-trim class="python">
+gold, silver, bronze, *others, last = [
+    "Mario", "Bowser", "Luigi", "Toad",
+                                       "Koopa Troopa", "Shy Guy"]
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>nonlocal</h2>
+          <pre><code data-trim class="python">
+def run():
+    var = 1
+    def increment():
+        nonlocal var
+        var += 1
+
+    for _ in range(3):
+        increment()
+
+    print(var)  # 4
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Division</h2>
+          <pre><code data-trim class="python">
+5 / 2  # 2.5
+5.0 // 3.0  # 1.0
+5 // 3  # 1
+          </code></pre>
+        </section>
+
+      </div>
+    </div>
+
+
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
 </html>
