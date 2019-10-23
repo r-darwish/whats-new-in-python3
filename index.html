@@ -40,6 +40,15 @@ eprint("error")
         </section>
 
         <section>
+          <h3>map, filter, items, keys, range, values return iterators</h3>
+          <p>Also, there are no iteritems, itervalues, iterkeys</p>
+          <pre><code data-trim class="python">
+map(lambda f: f + 1, [1, 2, 3, 4])[0]
+# TypeError: 'map' object is not subscriptable
+          </code></pre>
+        </section>
+
+        <section>
           <h2>Keyword only arguments</h2>
           <pre><code data-trim class="python">
 def compress_file(file_name, *, level=9, retain_original):
@@ -53,10 +62,10 @@ def compress_file(file_name, *, level=9, retain_original):
 noun = "wood"
 verb = "chuck"
 print(f"""How much {noun} would a {noun + verb} {verb}
-if a {noun + verb} would {verb} {noun}?""")
+if a {noun + verb} could {verb} {noun}?""")
 
 # How much wood would a woodchuck chuck
-# if a woodchuck would chuck wood?
+# if a woodchuck could chuck wood?
           </code></pre>
         </section>
 
@@ -112,9 +121,30 @@ source .env/bin/activate
         </section>
 
         <section>
+          <h2>asyncio</h2>
+          <pre><code data-trim class="python">
+import asyncio
+
+async def handle_echo(reader, writer):
+    data = await reader.read(100)
+    message = data.decode()
+    writer.write(data)
+    await writer.drain()
+    writer.close()
+
+loop = asyncio.get_event_loop()
+coro = asyncio.start_server(
+    handle_echo, '127.0.0.1', 8888, loop=loop)
+server = loop.run_until_complete(coro)
+loop.run_forever()
+          </code></pre>
+        </section>
+
+        <section>
           <h2>Enums</h2>
           <pre><code data-trim class="python">
 from enum import Enum, auto
+
 class Color(Enum):
     RED = auto()
     GREEN = auto()
@@ -133,8 +163,8 @@ from dataclasses import dataclass
 class FullName:
     first_name: str
     last_name: str
-
-# Usage:
+          </code></pre>
+          <pre class="fragment"><code data-trim class="python">
 people = [FullName("SpongeBob", "SquarePants"),
           FullName("Patrick", "Star"),
           FullName("Squidward", "Tentacles")]
@@ -228,7 +258,13 @@ for line in multigenerate("/etc/profile", "/etc/shells"):
           <pre><code data-trim class="python">
 gold, silver, bronze, *others, last = [
     "Mario", "Bowser", "Luigi", "Toad",
-                                       "Koopa Troopa", "Shy Guy"]
+    "Koopa Troopa", "Shy Guy"]
+
+# gold = 'Mario'
+# silver = 'Bowser'
+# bronze = 'Luigi'
+# others = ['Toad', 'Koopa Troopa']
+# last = 'Shy Guy'
           </code></pre>
         </section>
 
@@ -255,6 +291,57 @@ def run():
 5.0 // 3.0  # 1.0
 5 // 3  # 1
           </code></pre>
+        </section>
+
+        <section>
+          <h2>No unreasonable ordering</h2>
+          <pre><code data-trim class="python">
+None < 5
+# TypeError: '<' not supported between instances of 'NoneType'
+# and 'int'
+
+"Five" < 5
+# TypeError: '<' not supported between instances of 'str'
+# and 'int'
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>More specific exception</h2>
+          <pre><code data-trim class="python">
+try:
+    f = open("something", "r")
+except FileNotFoundError:
+    print("Where did it go?")
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>UTF-8 source files</h2>
+          <pre><code data-trim class="python">
+בלונים = {
+    "רותי": "כחול",
+    "סיגלית": "סגול",
+    "רון": "צהוב",
+    "אורי": "ירוק",
+    "אלון": "אדום",
+}
+
+for ילד, צבע in בלונים.items():
+    print(f"ל{ילד} בלון {צבע}")
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Assignment expressions</h2>
+          <pre><code data-trim class="python">
+while (block := f.read(256)) != '':
+    process(block)
+          </code></pre>
+        </section>
+
+        <section>
+          <h1>Questions?</h1>
         </section>
 
       </div>
